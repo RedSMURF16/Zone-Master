@@ -202,14 +202,14 @@ enum _:MAIN_SETTINGS
     SETTING_DEFAULT_AMMO_MODE,
     bool:SETTING_DEFAULT_AMMO_OVERFLOW,
 
-    Float:SETTING_DEFAULT_BOMB_FREQ[2],
-    SETTING_DEFAULT_BOMB_HE_SUPPLY[2],
-    SETTING_DEFAULT_BOMB_FB_SUPPLY[2],
-    SETTING_DEFAULT_BOMB_SMOKE_SUPPLY[2],
-    SETTING_DEFAULT_BOMB_HE_LIMIT,
-    SETTING_DEFAULT_BOMB_FB_LIMIT,
-    SETTING_DEFAULT_BOMB_SMOKE_LIMIT,
-    bool:SETTING_DEFAULT_BOMB_OVERFLOW,
+    Float:SETTING_DEFAULT_MASTER_FREQ[2],
+    SETTING_DEFAULT_MASTER_HE_SUPPLY[2],
+    SETTING_DEFAULT_MASTER_FB_SUPPLY[2],
+    SETTING_DEFAULT_MASTER_SMOKE_SUPPLY[2],
+    SETTING_DEFAULT_MASTER_HE_LIMIT,
+    SETTING_DEFAULT_MASTER_FB_LIMIT,
+    SETTING_DEFAULT_MASTER_SMOKE_LIMIT,
+    bool:SETTING_DEFAULT_MASTER_OVERFLOW,
 
     Float:SETTING_DEFAULT_CLOCK_RELOAD_SPEED[2],
     Float:SETTING_DEFAULT_CLOCK_ATTACK_SPEED[2],
@@ -332,14 +332,14 @@ enum _:MASTER_AMMO
 
 enum _:MASTER_BOMB
 {
-    Float:BOMB_FREQ[2],
-    BOMB_HE_SUPPLY[2],
-    BOMB_FB_SUPPLY[2],
-    BOMB_SMOKE_SUPPLY[2],
-    BOMB_HE_LIMIT,
-    BOMB_FB_LIMIT,
-    BOMB_SMOKE_LIMIT,
-    bool:BOMB_OVERFLOW
+    Float:MASTER_FREQ[2],
+    MASTER_HE_SUPPLY[2],
+    MASTER_FB_SUPPLY[2],
+    MASTER_SMOKE_SUPPLY[2],
+    MASTER_HE_LIMIT,
+    MASTER_FB_LIMIT,
+    MASTER_SMOKE_LIMIT,
+    bool:MASTER_OVERFLOW
 }
 
 enum _:MASTER_CLOCK
@@ -434,7 +434,7 @@ enum _:PLAYER_DATA
 {
     PDATA_MASTER_GHOST,
     PDATA_MASTER_MENU,
-    bool:PDATA_MASTER_ZONE,
+    bool:PDATA_MASTER_ACTION,
     bool:PDATA_SCALE_UP,
     PDATA_SCALE_FACTOR,
     Float:PDATA_OFFSET,
@@ -808,18 +808,18 @@ ReadFile()
                         eMasterAmmo[AMMO_MODE]                      = g_eSettings[SETTING_DEFAULT_AMMO_MODE]
                         eMasterAmmo[AMMO_OVERFLOW]                  = g_eSettings[SETTING_DEFAULT_AMMO_OVERFLOW]
 
-                        eMasterBomb[BOMB_FREQ][0]                   = g_eSettings[SETTING_DEFAULT_BOMB_FREQ][0]
-                        eMasterBomb[BOMB_FREQ][1]                   = g_eSettings[SETTING_DEFAULT_BOMB_FREQ][1]
-                        eMasterBomb[BOMB_HE_SUPPLY][0]              = g_eSettings[SETTING_DEFAULT_BOMB_HE_SUPPLY][0]
-                        eMasterBomb[BOMB_HE_SUPPLY][1]              = g_eSettings[SETTING_DEFAULT_BOMB_HE_SUPPLY][1]
-                        eMasterBomb[BOMB_FB_SUPPLY][0]              = g_eSettings[SETTING_DEFAULT_BOMB_FB_SUPPLY][0]
-                        eMasterBomb[BOMB_FB_SUPPLY][1]              = g_eSettings[SETTING_DEFAULT_BOMB_FB_SUPPLY][1]
-                        eMasterBomb[BOMB_SMOKE_SUPPLY][0]           = g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_SUPPLY][0]
-                        eMasterBomb[BOMB_SMOKE_SUPPLY][1]           = g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_SUPPLY][1]
-                        eMasterBomb[BOMB_HE_LIMIT]                  = g_eSettings[SETTING_DEFAULT_BOMB_HE_LIMIT]
-                        eMasterBomb[BOMB_FB_LIMIT]                  = g_eSettings[SETTING_DEFAULT_BOMB_FB_LIMIT]
-                        eMasterBomb[BOMB_SMOKE_LIMIT]               = g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_LIMIT]
-                        eMasterBomb[BOMB_OVERFLOW]                  = g_eSettings[SETTING_DEFAULT_BOMB_OVERFLOW]
+                        eMasterBomb[MASTER_FREQ][0]                   = g_eSettings[SETTING_DEFAULT_MASTER_FREQ][0]
+                        eMasterBomb[MASTER_FREQ][1]                   = g_eSettings[SETTING_DEFAULT_MASTER_FREQ][1]
+                        eMasterBomb[MASTER_HE_SUPPLY][0]              = g_eSettings[SETTING_DEFAULT_MASTER_HE_SUPPLY][0]
+                        eMasterBomb[MASTER_HE_SUPPLY][1]              = g_eSettings[SETTING_DEFAULT_MASTER_HE_SUPPLY][1]
+                        eMasterBomb[MASTER_FB_SUPPLY][0]              = g_eSettings[SETTING_DEFAULT_MASTER_FB_SUPPLY][0]
+                        eMasterBomb[MASTER_FB_SUPPLY][1]              = g_eSettings[SETTING_DEFAULT_MASTER_FB_SUPPLY][1]
+                        eMasterBomb[MASTER_SMOKE_SUPPLY][0]           = g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_SUPPLY][0]
+                        eMasterBomb[MASTER_SMOKE_SUPPLY][1]           = g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_SUPPLY][1]
+                        eMasterBomb[MASTER_HE_LIMIT]                  = g_eSettings[SETTING_DEFAULT_MASTER_HE_LIMIT]
+                        eMasterBomb[MASTER_FB_LIMIT]                  = g_eSettings[SETTING_DEFAULT_MASTER_FB_LIMIT]
+                        eMasterBomb[MASTER_SMOKE_LIMIT]               = g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_LIMIT]
+                        eMasterBomb[MASTER_OVERFLOW]                  = g_eSettings[SETTING_DEFAULT_MASTER_OVERFLOW]
 
                         eMasterClock[CLOCK_RELOAD_SPEED][0]         = g_eSettings[SETTING_DEFAULT_CLOCK_RELOAD_SPEED][0]
                         eMasterClock[CLOCK_RELOAD_SPEED][1]         = g_eSettings[SETTING_DEFAULT_CLOCK_RELOAD_SPEED][1]
@@ -967,20 +967,20 @@ ReadFile()
                             parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_AMMO_MODE], charsmax(g_eSettings[SETTING_DEFAULT_AMMO_MODE]))
                         else if ( equali(szKey, "SETTING_DEFAULT_AMMO_OVERFLOW") )
                             parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_AMMO_OVERFLOW], charsmax(g_eSettings[SETTING_DEFAULT_AMMO_OVERFLOW]))
-                        else if ( equali(szKey, "SETTING_DEFAULT_BOMB_FREQ") )
-                            parseSetting(DTYPE_FLOAT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_BOMB_FREQ], charsmax(g_eSettings[SETTING_DEFAULT_BOMB_FREQ]))
-                        else if ( equali(szKey, "SETTING_DEFAULT_BOMB_FB_SUPPLY") )
-                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_BOMB_FB_SUPPLY], charsmax(g_eSettings[SETTING_DEFAULT_BOMB_FB_SUPPLY]))
-                        else if ( equali(szKey, "SETTING_DEFAULT_BOMB_SMOKE_SUPPLY") )
-                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_SUPPLY], charsmax(g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_SUPPLY]))
-                        else if ( equali(szKey, "SETTING_DEFAULT_BOMB_HE_LIMIT") )
-                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_BOMB_HE_LIMIT], charsmax(g_eSettings[SETTING_DEFAULT_BOMB_HE_LIMIT]))
-                        else if ( equali(szKey, "SETTING_DEFAULT_BOMB_FB_LIMIT") )
-                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_BOMB_FB_LIMIT], charsmax(g_eSettings[SETTING_DEFAULT_BOMB_FB_LIMIT]))
-                        else if ( equali(szKey, "SETTING_DEFAULT_BOMB_SMOKE_LIMIT") )
-                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_LIMIT], charsmax(g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_LIMIT]))
-                        else if ( equali(szKey, "SETTING_DEFAULT_BOMB_OVERFLOW") )
-                            parseSetting(DTYPE_BOOL, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_BOMB_OVERFLOW], charsmax(g_eSettings[SETTING_DEFAULT_BOMB_OVERFLOW]))
+                        else if ( equali(szKey, "SETTING_DEFAULT_MASTER_FREQ") )
+                            parseSetting(DTYPE_FLOAT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_MASTER_FREQ], charsmax(g_eSettings[SETTING_DEFAULT_MASTER_FREQ]))
+                        else if ( equali(szKey, "SETTING_DEFAULT_MASTER_FB_SUPPLY") )
+                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_MASTER_FB_SUPPLY], charsmax(g_eSettings[SETTING_DEFAULT_MASTER_FB_SUPPLY]))
+                        else if ( equali(szKey, "SETTING_DEFAULT_MASTER_SMOKE_SUPPLY") )
+                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_SUPPLY], charsmax(g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_SUPPLY]))
+                        else if ( equali(szKey, "SETTING_DEFAULT_MASTER_HE_LIMIT") )
+                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_MASTER_HE_LIMIT], charsmax(g_eSettings[SETTING_DEFAULT_MASTER_HE_LIMIT]))
+                        else if ( equali(szKey, "SETTING_DEFAULT_MASTER_FB_LIMIT") )
+                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_MASTER_FB_LIMIT], charsmax(g_eSettings[SETTING_DEFAULT_MASTER_FB_LIMIT]))
+                        else if ( equali(szKey, "SETTING_DEFAULT_MASTER_SMOKE_LIMIT") )
+                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_LIMIT], charsmax(g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_LIMIT]))
+                        else if ( equali(szKey, "SETTING_DEFAULT_MASTER_OVERFLOW") )
+                            parseSetting(DTYPE_BOOL, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_MASTER_OVERFLOW], charsmax(g_eSettings[SETTING_DEFAULT_MASTER_OVERFLOW]))
                         else if ( equali(szKey, "SETTING_DEFAULT_CLOCK_RELOAD_SPEED") )
                             parseSetting(DTYPE_FLOAT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), g_eSettings[SETTING_DEFAULT_CLOCK_RELOAD_SPEED], charsmax(g_eSettings[SETTING_DEFAULT_CLOCK_RELOAD_SPEED]))
                         else if ( equali(szKey, "SETTING_DEFAULT_CLOCK_ATTACK_SPEED") )
@@ -1168,22 +1168,22 @@ ReadFile()
                     }
                     case SECTION_MASTER_BOMB:
                     {
-                        if ( equali(szKey, "BOMB_FREQ") )
-                            parseSetting(DTYPE_FLOAT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[BOMB_FREQ], charsmax(eMasterBomb[BOMB_FREQ]), g_eSettings[SETTING_DEFAULT_BOMB_FREQ])
-                        else if ( equali(szKey, "BOMB_HE_SUPPLY") )
-                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[BOMB_HE_SUPPLY], charsmax(eMasterBomb[BOMB_HE_SUPPLY]), g_eSettings[SETTING_DEFAULT_BOMB_HE_SUPPLY])
-                        else if ( equali(szKey, "BOMB_FB_SUPPLY") )
-                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[BOMB_FB_SUPPLY], charsmax(eMasterBomb[BOMB_FB_SUPPLY]), g_eSettings[SETTING_DEFAULT_BOMB_FB_SUPPLY])
-                        else if ( equali(szKey, "BOMB_SMOKE_SUPPLY") )
-                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[BOMB_SMOKE_SUPPLY], charsmax(eMasterBomb[BOMB_SMOKE_SUPPLY]), g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_SUPPLY])
-                        else if ( equali(szKey, "BOMB_HE_LIMIT") )
-                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[BOMB_HE_LIMIT], charsmax(eMasterBomb[BOMB_HE_LIMIT]), g_eSettings[SETTING_DEFAULT_BOMB_HE_LIMIT])
-                        else if ( equali(szKey, "BOMB_FB_LIMIT") )
-                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[BOMB_FB_LIMIT], charsmax(eMasterBomb[BOMB_FB_LIMIT]), g_eSettings[SETTING_DEFAULT_BOMB_FB_LIMIT])
-                        else if ( equali(szKey, "BOMB_SMOKE_LIMIT") )
-                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[BOMB_SMOKE_LIMIT], charsmax(eMasterBomb[BOMB_SMOKE_LIMIT]), g_eSettings[SETTING_DEFAULT_BOMB_SMOKE_LIMIT])
-                        else if ( equali(szKey, "BOMB_OVERFLOW") )
-                            parseSetting(DTYPE_BOOL, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[BOMB_OVERFLOW], charsmax(eMasterBomb[BOMB_OVERFLOW]), g_eSettings[SETTING_DEFAULT_BOMB_OVERFLOW])
+                        if ( equali(szKey, "MASTER_FREQ") )
+                            parseSetting(DTYPE_FLOAT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[MASTER_FREQ], charsmax(eMasterBomb[MASTER_FREQ]), g_eSettings[SETTING_DEFAULT_MASTER_FREQ])
+                        else if ( equali(szKey, "MASTER_HE_SUPPLY") )
+                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[MASTER_HE_SUPPLY], charsmax(eMasterBomb[MASTER_HE_SUPPLY]), g_eSettings[SETTING_DEFAULT_MASTER_HE_SUPPLY])
+                        else if ( equali(szKey, "MASTER_FB_SUPPLY") )
+                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[MASTER_FB_SUPPLY], charsmax(eMasterBomb[MASTER_FB_SUPPLY]), g_eSettings[SETTING_DEFAULT_MASTER_FB_SUPPLY])
+                        else if ( equali(szKey, "MASTER_SMOKE_SUPPLY") )
+                            parseSetting(DTYPE_INT_RANGE, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[MASTER_SMOKE_SUPPLY], charsmax(eMasterBomb[MASTER_SMOKE_SUPPLY]), g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_SUPPLY])
+                        else if ( equali(szKey, "MASTER_HE_LIMIT") )
+                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[MASTER_HE_LIMIT], charsmax(eMasterBomb[MASTER_HE_LIMIT]), g_eSettings[SETTING_DEFAULT_MASTER_HE_LIMIT])
+                        else if ( equali(szKey, "MASTER_FB_LIMIT") )
+                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[MASTER_FB_LIMIT], charsmax(eMasterBomb[MASTER_FB_LIMIT]), g_eSettings[SETTING_DEFAULT_MASTER_FB_LIMIT])
+                        else if ( equali(szKey, "MASTER_SMOKE_LIMIT") )
+                            parseSetting(DTYPE_INT, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[MASTER_SMOKE_LIMIT], charsmax(eMasterBomb[MASTER_SMOKE_LIMIT]), g_eSettings[SETTING_DEFAULT_MASTER_SMOKE_LIMIT])
+                        else if ( equali(szKey, "MASTER_OVERFLOW") )
+                            parseSetting(DTYPE_BOOL, szKey, charsmax(szKey), szValue, charsmax(szValue), eMasterBomb[MASTER_OVERFLOW], charsmax(eMasterBomb[MASTER_OVERFLOW]), g_eSettings[SETTING_DEFAULT_MASTER_OVERFLOW])
 
                         ArraySetArray(eMaster[MASTER_DATA], 0, eMasterBomb)
                     }
@@ -1357,6 +1357,7 @@ public client_disconnected(id)
     }
 
     g_ePlayerData[id][PDATA_MASTER_GHOST]   = 0
+    g_ePlayerData[id][PDATA_MASTER_ACTION]  = false
     g_ePlayerData[id][PDATA_MASTER_MENU]    = 0
 }
 
@@ -1552,6 +1553,7 @@ public menuStatus(id, iMenu)
     formatex(szItem, charsmax(szItem), "%L", id, "MASTER_STATUS_ALL_DEFAULT")
     menu_additem(iMenu, szItem)
 
+    g_ePlayerData[id][PDATA_MASTER_ACTION] = true
     eMaster[MASTER_FLAGS] |= FLAG_SELECT
     ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
 }
@@ -1647,6 +1649,7 @@ public menuHandlerStatus(id, menu, item)
         }
         default:
         {
+            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
             g_ePlayerData[id][PDATA_MASTER_MENU] = 0
         }
     }
@@ -1669,6 +1672,7 @@ public menuRemove(id, iMenu)
     formatex(szItem, charsmax(szItem), "%L", id, "MASTER_REMOVE_ALL")
     menu_additem(iMenu, szItem)
 
+    g_ePlayerData[id][PDATA_MASTER_ACTION] = true
     eMaster[MASTER_FLAGS] |= FLAG_SELECT
     ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
 }
@@ -1734,6 +1738,7 @@ public menuHandlerRemove(id, menu, item)
         }
         default:
         {
+            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
             g_ePlayerData[id][PDATA_MASTER_MENU] = 0
         }
     }
@@ -1858,6 +1863,7 @@ public menuHandlerScale(id, menu, item)
         {
             masterTrace(eMaster, id)
             g_ePlayerData[id][PDATA_MASTER_GHOST] = 0
+            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
 
             if ( eMaster[MASTER_FLAGS] & FLAG_ACTIVE_DELAY )
                 eMaster[MASTER_NEXT_ENABLE] = fCurrentTime + random_float(eMaster[MASTER_ACTIVE_DELAY][0], eMaster[MASTER_ACTIVE_DELAY][1])
@@ -1877,6 +1883,7 @@ public menuHandlerScale(id, menu, item)
             masterKill(eMaster[MASTER_ID])
             masterRemove(iItem)
             g_ePlayerData[id][PDATA_MASTER_GHOST] = 0
+            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
         }
     }
 
@@ -1944,9 +1951,15 @@ public masterTask()
         fGravity = 1.0
         g_ePlayerData[id][PDATA_WINGS] = false
 
-        if ( g_ePlayerData[id][PDATA_MASTER_GHOST]
-        && masterGet(eMaster, g_ePlayerData[id][PDATA_MASTER_GHOST]) != -1 )
+        if ( !g_ePlayerData[id][PDATA_MASTER_GHOST] )
+        {
+            if ( g_ePlayerData[id][PDATA_MASTER_ACTION] )
+                masterCheck(id)
+        }
+        else if ( masterGet(eMaster, g_ePlayerData[id][PDATA_MASTER_GHOST]) != -1 )
+        {
             masterTrace(eMaster, id)
+        }
 
         for ( new j = 0; j < g_iMaster; j ++ )
         {
@@ -1958,7 +1971,8 @@ public masterTask()
             {
                 case CLASS_AMMO:
                 {
-                    if ( fCurrentTime >= g_ePlayerData[id][PDATA_NEXT_AMMO] )
+                    if ( (1 << iWeapon) & CSW_ALL_GUNS
+                    && fCurrentTime >= g_ePlayerData[id][PDATA_NEXT_AMMO] )
                     {
                         ArrayGetArray(eMaster[MASTER_DATA], 0, eMasterAmmo)
 
@@ -1977,17 +1991,17 @@ public masterTask()
                     {
                         ArrayGetArray(eMaster[MASTER_DATA], 0, eMasterBomb)
 
-                        iNewHe += random_num(eMasterBomb[BOMB_HE_SUPPLY][0], eMasterBomb[BOMB_HE_SUPPLY][1])
-                        if ( !eMasterBomb[BOMB_OVERFLOW] && iNewHe > eMasterBomb[BOMB_HE_LIMIT] )
-                            iNewHe = eMasterBomb[BOMB_HE_LIMIT]
+                        iNewHe += random_num(eMasterBomb[MASTER_HE_SUPPLY][0], eMasterBomb[MASTER_HE_SUPPLY][1])
+                        if ( !eMasterBomb[MASTER_OVERFLOW] && iNewHe > eMasterBomb[MASTER_HE_LIMIT] )
+                            iNewHe = eMasterBomb[MASTER_HE_LIMIT]
 
-                        iNewFb += random_num(eMasterBomb[BOMB_FB_SUPPLY][0], eMasterBomb[BOMB_FB_SUPPLY][1])
-                        if ( !eMasterBomb[BOMB_OVERFLOW] && iNewFb > eMasterBomb[BOMB_FB_LIMIT] )
-                            iNewFb = eMasterBomb[BOMB_FB_LIMIT]
+                        iNewFb += random_num(eMasterBomb[MASTER_FB_SUPPLY][0], eMasterBomb[MASTER_FB_SUPPLY][1])
+                        if ( !eMasterBomb[MASTER_OVERFLOW] && iNewFb > eMasterBomb[MASTER_FB_LIMIT] )
+                            iNewFb = eMasterBomb[MASTER_FB_LIMIT]
 
-                        iNewSmoke += random_num(eMasterBomb[BOMB_SMOKE_SUPPLY][0], eMasterBomb[BOMB_SMOKE_SUPPLY][1])
-                        if ( !eMasterBomb[BOMB_OVERFLOW] && iNewSmoke > eMasterBomb[BOMB_SMOKE_LIMIT] )
-                            iNewSmoke = eMasterBomb[BOMB_SMOKE_LIMIT]
+                        iNewSmoke += random_num(eMasterBomb[MASTER_SMOKE_SUPPLY][0], eMasterBomb[MASTER_SMOKE_SUPPLY][1])
+                        if ( !eMasterBomb[MASTER_OVERFLOW] && iNewSmoke > eMasterBomb[MASTER_SMOKE_LIMIT] )
+                            iNewSmoke = eMasterBomb[MASTER_SMOKE_LIMIT]
                     }
                 }
                 case CLASS_CLOCK:
@@ -2151,7 +2165,7 @@ public masterTask()
             }
 
             masterSound(id, SOUND_CLIP1)
-            g_ePlayerData[id][PDATA_NEXT_BOMB] = fCurrentTime + random_float(eMasterBomb[BOMB_FREQ][0], eMasterBomb[BOMB_FREQ][1])
+            g_ePlayerData[id][PDATA_NEXT_BOMB] = fCurrentTime + random_float(eMasterBomb[MASTER_FREQ][0], eMasterBomb[MASTER_FREQ][1])
         }
 
         if ( fHealth != fNewHealth )
@@ -2377,6 +2391,7 @@ public masterCreate(id, iItem)
     if ( id )
     {
         g_ePlayerData[id][PDATA_MASTER_GHOST] = iEnt
+        g_ePlayerData[id][PDATA_MASTER_ACTION] = true
         g_ePlayerData[id][PDATA_SCALE_UP] = true
         g_ePlayerData[id][PDATA_SCALE_FACTOR] = 0
         g_ePlayerData[id][PDATA_OFFSET] = g_eSettings[SETTING_OFFSET_BASE]
@@ -2438,12 +2453,6 @@ public saveData(id)
         formatex(szData, charsmax(szData), "status = %d^n", eMaster[MASTER_STATUS])
         fputs(iFile, szData)
 
-        formatex(szData, charsmax(szData), "team = %d^n", eMaster[MASTER_TEAM])
-        fputs(iFile, szData)
-
-        formatex(szData, charsmax(szData), "animation = %d^n", eMaster[MASTER_ANIM])
-        fputs(iFile, szData)
-
         formatex(szData, charsmax(szData), "scale = %.2f %.2f %.2f^n",
         eMaster[MASTER_SCALE][0], eMaster[MASTER_SCALE][1], eMaster[MASTER_SCALE][2])
         fputs(iFile, szData)
@@ -2472,7 +2481,7 @@ public loadData()
 {
     new szFile[128], iFile,
         szData[64], szKey[32], szValue[32],
-        iItem, iFlags, iStatus, iTeam, iAnim, Float:fScale[3], Float:fOrigin[3], Float:fCorners[24],
+        iItem, iFlags, iStatus, Float:fScale[3], Float:fOrigin[3], Float:fCorners[24],
         iCorner, iCount = -1
 
     get_mapname(szFile, charsmax(szFile))
@@ -2480,10 +2489,7 @@ public loadData()
 
     iFile = fopen(szFile, "rt")
     if ( !iFile )
-    {
-        console_print(0, "%L %L", 0, "MASTER_CHAT_TAG", 0, "MASTER_CHAT_NO_DATA")
         return PLUGIN_HANDLED
-    }
 
     while( !feof(iFile) )
     {
@@ -2492,7 +2498,7 @@ public loadData()
         if ( szData[0] == '[' )
         {
             if ( iCount != -1 )
-                loadDataMaster(fCorners, fScale, fOrigin, iItem, iFlags, iStatus, iTeam, iAnim, iCount)
+                loadDataMaster(fCorners, fScale, fOrigin, iItem, iFlags, iStatus, iCount)
 
             iCount ++
         }
@@ -2513,14 +2519,6 @@ public loadData()
             else if ( equal(szKey, "status") )
             {
                 iStatus = str_to_num(szValue)
-            }
-            else if ( equal(szKey, "team") )
-            {
-                iTeam = str_to_num(szValue)
-            }
-            else if ( equal(szKey, "animation") )
-            {
-                iAnim = str_to_num(szValue)
             }
             else if ( equal(szKey, "scale") )
             {
@@ -2555,13 +2553,13 @@ public loadData()
     }
 
     if ( iCount != -1 )
-        loadDataMaster(fCorners, fScale, fOrigin, iItem, iFlags, iStatus, iTeam, iAnim, iCount)
+        loadDataMaster(fCorners, fScale, fOrigin, iItem, iFlags, iStatus, iCount)
 
     fclose(iFile)
     return PLUGIN_HANDLED
 }
 
-stock loadDataMaster(Float:fCorners[24], Float:fScale[3], Float:fOrigin[3], iItem, iFlags, iStatus, iTeam, iAnim, iCount)
+stock loadDataMaster(Float:fCorners[24], Float:fScale[3], Float:fOrigin[3], iItem, iFlags, iStatus, iCount)
 {
     new eMaster[MASTER]
     masterCreate(0, iItem)
@@ -2569,8 +2567,6 @@ stock loadDataMaster(Float:fCorners[24], Float:fScale[3], Float:fOrigin[3], iIte
 
     eMaster[MASTER_FLAGS] = iFlags
     eMaster[MASTER_STATUS] = iStatus
-    eMaster[MASTER_TEAM] = iTeam
-    eMaster[MASTER_ANIM] = iAnim
     xs_vec_copy(fScale, eMaster[MASTER_SCALE])
     xs_vec_copy(fOrigin, eMaster[MASTER_ORIGIN])
     for ( new i = 0; i < 24; i ++ )
@@ -2641,6 +2637,8 @@ public fwdSpawn(iEnt)
 
 public fwdKilled(id, iAttacker, bGib)
 {
+    g_ePlayerData[id][PDATA_MASTER_ACTION] = false
+
     if ( g_ePlayerData[id][PDATA_MASTER_GHOST] )
     {
         new eMaster[MASTER], iItem
@@ -2851,6 +2849,64 @@ public masterTrace(eMaster[MASTER], id)
     masterBeam(eMaster)
 
     set_pev(eMaster[MASTER_ID], pev_origin, eMaster[MASTER_ORIGIN])
+}
+
+stock masterCheck(id)
+{
+    new eMaster[MASTER], Float:fVec1[3], Float:fVec2[3], Float:fForward[3]
+    new iBest, Float:fBestDist, Float:fTraceLength, Float:fDot, Float:fDist
+
+    pev(id, pev_origin, fVec1)
+    pev(id, pev_view_ofs, fVec2)
+    xs_vec_add(fVec1, fVec2, fVec1)
+
+    pev(id, pev_v_angle, fForward)
+    engfunc(EngFunc_MakeVectors, fForward)
+    global_get(glb_v_forward, fForward)
+
+    xs_vec_mul_scalar(fForward, 9999.9, fVec2)
+    xs_vec_add(fVec2, fVec1, fVec2)
+
+    engfunc(EngFunc_TraceLine, fVec1, fVec2, DONT_IGNORE_MONSTERS, id, 0)
+    get_tr2(0, TR_vecEndPos, fVec2)
+
+    iBest = -1
+    fBestDist = 20.0
+    fTraceLength = get_distance_f(fVec1, fVec2)
+
+    for ( new i = 0; i < g_iMaster; i ++ )
+    {
+        ArrayGetArray(g_aMaster, i, eMaster)
+        xs_vec_sub(eMaster[MASTER_ORIGIN], fVec1, fVec2)
+        fDot = xs_vec_dot(fVec2, fForward)
+
+        if ( fDot < 0.0 || fDot > fTraceLength )
+            continue
+
+        xs_vec_copy(fForward, fVec2)
+        xs_vec_mul_scalar(fVec2, fDot, fVec2)
+        xs_vec_add(fVec2, fVec1, fVec2)
+
+        fDist = get_distance_f(eMaster[MASTER_ORIGIN], fVec2)
+        if ( fDist < fBestDist )
+        {
+            fBestDist = fDist
+            iBest = i
+        }
+    }
+
+    if ( iBest != -1
+    && g_ePlayerData[id][PDATA_MASTER_MENU] != iBest )
+    {
+        ArrayGetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
+        eMaster[MASTER_FLAGS] &= ~FLAG_SELECT
+        ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
+
+        ArrayGetArray(g_aMaster, iBest, eMaster)
+        eMaster[MASTER_FLAGS] |= FLAG_SELECT
+        ArraySetArray(g_aMaster, iBest, eMaster)
+        g_ePlayerData[id][PDATA_MASTER_MENU] = iBest
+    }
 }
 
 stock masterSetBox(eMaster[MASTER], bool:bSetCorners = false)

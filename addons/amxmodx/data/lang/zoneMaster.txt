@@ -2,7 +2,6 @@
 MASTER_CHAT_TAG                        = ^4[ZONE MASTER]^1
 MASTER_CHAT_LIMIT                      = You've reached the maximum number of Zone Masters ^4%d
 MASTER_CHAT_NO_MASTER                  = There are no Zone Masters available
-MASTER_CHAT_NO_DATA                    = Zone Masters data hasn't been found
 MASTER_CHAT_CREATE_NEW                 = ^3%s ^1created
 MASTER_CHAT_STATUS_CURRENT             = ^3%s ^1is %L
 MASTER_CHAT_STATUS_ALL_ENABLED         = All Zone Masters are now enabled
@@ -28,9 +27,6 @@ MASTER_OFF                             = \r[OFF]
 MASTER_ENABLED                         = \y[ENABLED]
 MASTER_DISABLED                        = \r[DISABLED]
 MASTER_DEFAULT                         = \d[DEFAULT]
-MASTER_NEVER                           = \y[NEVER]
-MASTER_DELAY                           = \y[DELAY]
-MASTER_ROUND_START                     = \y[ROUND-START]
 MASTER_INCREASE                        = \y[INCREASE]
 MASTER_DECREASE                        = \r[DECREASE]
 

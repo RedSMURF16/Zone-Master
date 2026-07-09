@@ -18,6 +18,7 @@
 *
 *	Changelog:
 *       v1.0: Initial release.
+*       v1.1: Bug fixes and improvements.
 *
 */
 
@@ -68,7 +69,10 @@
 #define MEMBER_IN_SPECIAL_RELOAD    55
 #define MEMBER_NEXT_ATTACK          83
 
-new const PLUGIN_VERSION[]       = "1.0"
+#define XO_CBASEPLAYER              5
+#define XO_CBASEPLAYERWEAPON        4
+
+new const PLUGIN_VERSION[]       = "1.1"
 new const Float:DELAY_ON_CONNECT = 1.0
 new const ERROR_FILE[]           = "ZoneMaster_ERRORS.log"
 
@@ -545,6 +549,16 @@ new const g_iWeaponMaxBp[] =
     120,   100,   100,    90,    90,    90,   100,   120,    30,   120,
     200,    32,    90,   120,    90,     0,    35,    90,    90,     0,
     100
+}
+
+new Float:g_fDirections[][] =
+{
+    {-1.0, 0.0, 0.0},
+    {1.0, 0.0, 0.0},
+    {0.0, -1.0, 0.0},
+    {0.0, 1.0, 0.0},
+    {0.0, 0.0, -1.0},
+    {0.0, 0.0, 1.0}
 }
 
 new g_szMenuHandler[][] =
@@ -1644,6 +1658,14 @@ public menuHandlerStatus(id, menu, item)
             masterSound(id, SOUND_MENU_ALERT)
             masterMenu(id, MENU_STATUS)
         }
+        case MENU_EXIT:
+        {
+            masterSound(id, SOUND_MENU_NAV)
+            masterMenu(id, MENU_ROOT)
+
+            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
+            g_ePlayerData[id][PDATA_MASTER_MENU] = 0
+        }
         default:
         {
             g_ePlayerData[id][PDATA_MASTER_ACTION] = false
@@ -1732,6 +1754,14 @@ public menuHandlerRemove(id, menu, item)
 
             masterSound(id, SOUND_MENU_ALERT)
             masterMenu(id, MENU_REMOVE)
+        }
+        case MENU_EXIT:
+        {
+            masterSound(id, SOUND_MENU_NAV)
+            masterMenu(id, MENU_ROOT)
+
+            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
+            g_ePlayerData[id][PDATA_MASTER_MENU] = 0
         }
         default:
         {
@@ -1874,6 +1904,16 @@ public menuHandlerScale(id, menu, item)
             client_print_color(id, id, "%L %L", id, "MASTER_CHAT_TAG", id, "MASTER_CHAT_CREATE_NEW", eMaster[MASTER_NAME])
             masterSound(id, SOUND_MENU_NAV)
             masterMenu(id, MENU_ROOT)
+        }
+        case MENU_EXIT:
+        {
+            masterSound(id, SOUND_MENU_NAV)
+            masterMenu(id, MENU_CREATE)
+
+            masterKill(eMaster[MASTER_ID])
+            masterRemove(iItem)
+            g_ePlayerData[id][PDATA_MASTER_GHOST] = 0
+            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
         }
         default:
         {
@@ -2666,21 +2706,21 @@ public fwdResetMaxSpeedPlayer(id)
 public fwdWeaponReload(iEnt)
 {
     if ( !pev_valid(iEnt)
-    || (!get_pdata_int(iEnt, MEMBER_IN_RELOAD) && !get_pdata_int(iEnt, MEMBER_IN_SPECIAL_RELOAD)) )
+    || (!get_pdata_int(iEnt, MEMBER_IN_RELOAD, XO_CBASEPLAYERWEAPON) && !get_pdata_int(iEnt, MEMBER_IN_SPECIAL_RELOAD, XO_CBASEPLAYERWEAPON)) )
         return HAM_IGNORED
 
     new id
-    id = get_pdata_cbase(iEnt, MEMBER_OWNER)
+    id = get_pdata_cbase(iEnt, MEMBER_OWNER, XO_CBASEPLAYER)
     if ( !is_user_alive(id)
     || !g_ePlayerData[id][PDATA_CLOCK] )
         return HAM_IGNORED
 
     new Float:fSpeed
-    fSpeed = get_pdata_float(iEnt, MEMBER_NEXT_IDLE) * g_ePlayerData[id][PDATA_CLOCK_RELOAD_SPEED]
-    set_pdata_float(id, MEMBER_NEXT_ATTACK, fSpeed)
-    set_pdata_float(iEnt, MEMBER_NEXT_PRIMARY, fSpeed)
-    set_pdata_float(iEnt, MEMBER_NEXT_SECONDARY, fSpeed)
-    set_pdata_float(iEnt, MEMBER_NEXT_IDLE, fSpeed)
+    fSpeed = get_pdata_float(iEnt, MEMBER_NEXT_IDLE, XO_CBASEPLAYERWEAPON) * g_ePlayerData[id][PDATA_CLOCK_RELOAD_SPEED]
+    set_pdata_float(id, MEMBER_NEXT_ATTACK, fSpeed, XO_CBASEPLAYER)
+    set_pdata_float(iEnt, MEMBER_NEXT_PRIMARY, fSpeed, XO_CBASEPLAYERWEAPON)
+    set_pdata_float(iEnt, MEMBER_NEXT_SECONDARY, fSpeed, XO_CBASEPLAYERWEAPON)
+    set_pdata_float(iEnt, MEMBER_NEXT_IDLE, fSpeed, XO_CBASEPLAYERWEAPON)
 
     if ( cs_get_weapon_id(iEnt) == CSW_DEAGLE )
         set_task(fSpeed, "weaponPlayIdle", id + TASK_WEAPON_IDLE)
@@ -2694,7 +2734,7 @@ public fwdWeaponAttack(iEnt)
         return HAM_IGNORED
 
     new id
-    id = get_pdata_cbase(iEnt, MEMBER_OWNER)
+    id = get_pdata_cbase(iEnt, MEMBER_OWNER, XO_CBASEPLAYER)
     if ( !is_user_alive(id)
     || !g_ePlayerData[id][PDATA_CLOCK] )
         return HAM_IGNORED
@@ -2705,8 +2745,8 @@ public fwdWeaponAttack(iEnt)
     fPunchAngle[1] *= g_ePlayerData[id][PDATA_CLOCK_RECOIL_SETTING]
     set_pev(id, pev_punchangle, fPunchAngle)
 
-    set_pdata_float(iEnt, MEMBER_NEXT_PRIMARY, get_pdata_float(iEnt, MEMBER_NEXT_PRIMARY) * g_ePlayerData[id][PDATA_CLOCK_ATTACK_SPEED])
-    set_pdata_float(iEnt, MEMBER_NEXT_SECONDARY, get_pdata_float(iEnt, MEMBER_NEXT_SECONDARY) * g_ePlayerData[id][PDATA_CLOCK_ATTACK_SPEED])
+    set_pdata_float(iEnt, MEMBER_NEXT_PRIMARY, get_pdata_float(iEnt, MEMBER_NEXT_PRIMARY) * g_ePlayerData[id][PDATA_CLOCK_ATTACK_SPEED], XO_CBASEPLAYERWEAPON)
+    set_pdata_float(iEnt, MEMBER_NEXT_SECONDARY, get_pdata_float(iEnt, MEMBER_NEXT_SECONDARY) * g_ePlayerData[id][PDATA_CLOCK_ATTACK_SPEED], XO_CBASEPLAYERWEAPON)
 
     return HAM_IGNORED
 }
@@ -2717,17 +2757,17 @@ public fwdWeaponDeploy(iEnt)
         return HAM_IGNORED
 
     new id
-    id = get_pdata_cbase(iEnt, MEMBER_OWNER)
+    id = get_pdata_cbase(iEnt, MEMBER_OWNER, XO_CBASEPLAYER)
     if ( !is_user_alive(id)
     || !g_ePlayerData[id][PDATA_CLOCK] )
         return HAM_IGNORED
 
     new Float:fSpeed
-    fSpeed = get_pdata_float(id, MEMBER_NEXT_ATTACK) * g_ePlayerData[id][PDATA_CLOCK_DEPLOY_SPEED]
-    set_pdata_float(id, MEMBER_NEXT_ATTACK, fSpeed)
-    set_pdata_float(iEnt, MEMBER_NEXT_PRIMARY, fSpeed)
-    set_pdata_float(iEnt, MEMBER_NEXT_SECONDARY, fSpeed)
-    set_pdata_float(iEnt, MEMBER_NEXT_IDLE, fSpeed)
+    fSpeed = get_pdata_float(id, MEMBER_NEXT_ATTACK, XO_CBASEPLAYER) * g_ePlayerData[id][PDATA_CLOCK_DEPLOY_SPEED]
+    set_pdata_float(id, MEMBER_NEXT_ATTACK, fSpeed, XO_CBASEPLAYER)
+    set_pdata_float(iEnt, MEMBER_NEXT_PRIMARY, fSpeed, XO_CBASEPLAYERWEAPON)
+    set_pdata_float(iEnt, MEMBER_NEXT_SECONDARY, fSpeed, XO_CBASEPLAYERWEAPON)
+    set_pdata_float(iEnt, MEMBER_NEXT_IDLE, fSpeed, XO_CBASEPLAYERWEAPON)
 
     if ( cs_get_weapon_id(iEnt) == CSW_DEAGLE )
         set_task(fSpeed, "weaponPlayIdle", id + TASK_WEAPON_IDLE)
@@ -2907,12 +2947,8 @@ stock masterSetBox(eMaster[MASTER], bool:bSetCorners = false)
     if ( bSetCorners )
         boxCorners(eMaster)
 
-    for ( new i = 0; i < 3; i ++ )
-    {
-        eMaster[MASTER_MINS][i] = eMaster[MASTER_CORNERS][i]
-        eMaster[MASTER_MAXS][i] = eMaster[MASTER_CORNERS][i]
-    }
-
+    xs_vec_copy(eMaster[MASTER_CORNERS][0], eMaster[MASTER_MINS])
+    xs_vec_copy(eMaster[MASTER_CORNERS][0], eMaster[MASTER_MAXS])
     for ( new i = 1; i < 8; i ++ )
     {
         for ( new j = 0; j < 3; j ++ )
@@ -2921,6 +2957,9 @@ stock masterSetBox(eMaster[MASTER], bool:bSetCorners = false)
             eMaster[MASTER_MAXS][j] = floatmax(eMaster[MASTER_MAXS][j], eMaster[MASTER_CORNERS][i * 3 + j])
         }
     }
+
+    xs_vec_sub(eMaster[MASTER_MINS], eMaster[MASTER_ORIGIN], eMaster[MASTER_MINS])
+    xs_vec_sub(eMaster[MASTER_MAXS], eMaster[MASTER_ORIGIN], eMaster[MASTER_MAXS])
 }
 
 public boxCorners(eMaster[MASTER])
@@ -2960,20 +2999,28 @@ public boxCorners(eMaster[MASTER])
 
 stock masterSetOffset(eMaster[MASTER])
 {
-    new Float:fVec1[3],
-        Float:fGap, Float:fDist
+    new Float:fGaps[6], Float:fVec1[3], Float:fCurrentGap
+    fGaps[0] = -eMaster[MASTER_MINS][0]
+    fGaps[1] = eMaster[MASTER_MAXS][0]
+    fGaps[2] = -eMaster[MASTER_MINS][1]
+    fGaps[3] = eMaster[MASTER_MAXS][1]
+    fGaps[4] = -eMaster[MASTER_MINS][2]
+    fGaps[5] = eMaster[MASTER_MAXS][2]
 
-    xs_vec_sub(eMaster[MASTER_ORIGIN], Float:{0.0, 0.0, 9999.9}, fVec1)
-    engfunc(EngFunc_TraceLine, eMaster[MASTER_ORIGIN], fVec1, IGNORE_MONSTERS, eMaster[MASTER_ID], 0)
-    get_tr2(0, TR_vecEndPos, fVec1)
-    fDist = xs_vec_distance(eMaster[MASTER_ORIGIN], fVec1)
-    fGap = eMaster[MASTER_ORIGIN][2] - eMaster[MASTER_MINS][2]
-
-    if ( fDist < (fGap + 1.0) )
+    for ( new i = 0; i < 6; i ++ )
     {
-        get_tr2(0, TR_vecPlaneNormal, fVec1)
-        xs_vec_mul_scalar(fVec1, (fGap + 1.0) - fDist, fVec1)
-        xs_vec_add(eMaster[MASTER_ORIGIN], fVec1, eMaster[MASTER_ORIGIN])
+        xs_vec_mul_scalar(g_fDirections[i], 9999.9, fVec1)
+        xs_vec_add(fVec1, eMaster[MASTER_ORIGIN], fVec1)
+        engfunc(EngFunc_TraceLine, eMaster[MASTER_ORIGIN], fVec1, DONT_IGNORE_MONSTERS, eMaster[MASTER_ID], 0)
+        get_tr2(0, TR_vecEndPos, fVec1)
+        fCurrentGap = xs_vec_distance(eMaster[MASTER_ORIGIN], fVec1)
+
+        if ( fCurrentGap < (fGaps[i] + 1.0) )
+        {
+            get_tr2(0, TR_vecPlaneNormal, fVec1)
+            xs_vec_mul_scalar(fVec1, (fGaps[i] + 1.0) - fCurrentGap, fVec1)
+            xs_vec_add(eMaster[MASTER_ORIGIN], fVec1, eMaster[MASTER_ORIGIN])
+        }
     }
 }
 
@@ -2987,16 +3034,12 @@ stock masterSetAnim(eMaster[MASTER])
 
 stock masterSetActive(eMaster[MASTER])
 {
-    new Float:fMins[3], Float:fMaxs[3]
-
     set_pev(eMaster[MASTER_ID], pev_solid, SOLID_TRIGGER)
     set_pev(eMaster[MASTER_ID], pev_movetype, MOVETYPE_NONE)
-    xs_vec_sub(eMaster[MASTER_MINS], eMaster[MASTER_ORIGIN], fMins)
-    xs_vec_sub(eMaster[MASTER_MAXS], eMaster[MASTER_ORIGIN], fMaxs)
-
     if ( eMaster[MASTER_FLAGS] & FLAG_ICON )
         engfunc(EngFunc_SetModel, eMaster[MASTER_ID], eMaster[MASTER_ICON])
-    engfunc(EngFunc_SetSize, eMaster[MASTER_ID], fMins, fMaxs)
+
+    engfunc(EngFunc_SetSize, eMaster[MASTER_ID], eMaster[MASTER_MINS], eMaster[MASTER_MAXS])
 }
 
 stock masterBeam(eMaster[MASTER])
@@ -3063,7 +3106,7 @@ stock beamDraw(Float:fStart[3], Float:fEnd[3], bool:bActive)
 stock ammoPickup(id, iWeaponActive, iAmount)
 {
     new iAmmoType
-    iAmmoType = get_pdata_int(iWeaponActive, MEMBER_AMMO_TYPE)
+    iAmmoType = get_pdata_int(iWeaponActive, MEMBER_AMMO_TYPE, XO_CBASEPLAYERWEAPON)
 
     message_begin(MSG_ONE_UNRELIABLE, g_iAmmoPickup, .player = id)
     write_byte(iAmmoType)
@@ -3171,11 +3214,15 @@ stock masterSound(iEnt, iSound, iChan = CHAN_ITEM, bool:bPlayer = true, iFlags =
 
 stock bool:isMasterActive(eMaster[MASTER], Float:fOrigin[3], id)
 {
+    new Float:fAbsMins[3], Float:fAbsMaxs[3]
+    xs_vec_add(eMaster[MASTER_MINS], eMaster[MASTER_ORIGIN], fAbsMins)
+    xs_vec_add(eMaster[MASTER_MAXS], eMaster[MASTER_ORIGIN], fAbsMaxs)
+
     if ( eMaster[MASTER_FLAGS] & FLAG_ACTIVE
     && CsTeams:eMaster[MASTER_TEAM] & cs_get_user_team(id)
-    && fOrigin[0] >= eMaster[MASTER_MINS][0] && fOrigin[0] <= eMaster[MASTER_MAXS][0]
-    && fOrigin[1] >= eMaster[MASTER_MINS][1] && fOrigin[1] <= eMaster[MASTER_MAXS][1]
-    && fOrigin[2] >= eMaster[MASTER_MINS][2] && fOrigin[2] <= eMaster[MASTER_MAXS][2] )
+    && fOrigin[0] >= fAbsMins[0] && fOrigin[0] <= fAbsMaxs[0]
+    && fOrigin[1] >= fAbsMins[1] && fOrigin[1] <= fAbsMaxs[1]
+    && fOrigin[2] >= fAbsMins[2] && fOrigin[2] <= fAbsMaxs[2] )
         return true
 
     return false

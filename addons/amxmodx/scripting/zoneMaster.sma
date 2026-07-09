@@ -1907,13 +1907,13 @@ public menuHandlerScale(id, menu, item)
         }
         case MENU_EXIT:
         {
-            masterSound(id, SOUND_MENU_NAV)
-            masterMenu(id, MENU_CREATE)
-
             masterKill(eMaster[MASTER_ID])
             masterRemove(iItem)
             g_ePlayerData[id][PDATA_MASTER_GHOST] = 0
             g_ePlayerData[id][PDATA_MASTER_ACTION] = false
+
+            masterSound(id, SOUND_MENU_NAV)
+            masterMenu(id, MENU_CREATE)
         }
         default:
         {

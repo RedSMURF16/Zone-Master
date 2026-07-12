@@ -443,6 +443,9 @@ enum _:PLAYER_DATA
     Float:PDATA_OFFSET,
     Float:PDATA_NEXT_OFFSET,
 
+    PDATA_MENU_TYPE,
+    bool:PDATA_MENU_TRACE,
+
     Float:PDATA_NEXT_AMMO,
     Float:PDATA_NEXT_BOMB,
     bool:PDATA_CLOCK,
@@ -718,7 +721,6 @@ public eventRoundStart()
             continue
 
         masterReset(eMaster)
-
         if ( eMaster[MASTER_ACTIVE_CHANCE] >= random_float(0.0, 1.0) )
         {
             if ( eMaster[MASTER_FLAGS] & FLAG_ACTIVE_DELAY )
@@ -1385,6 +1387,9 @@ public masterInit()
 
 public masterMenu(id, iType)
 {
+    if ( !is_user_connected(id) )
+        return PLUGIN_HANDLED
+
     new szData[64], iMenu
     formatex(szData, charsmax(szData), "%L", id, "MASTER_MENU_TITLE", PLUGIN_VERSION)
     iMenu = menu_create(szData, g_szMenuHandler[iType])
@@ -1565,6 +1570,7 @@ public menuStatus(id, iMenu)
     menu_additem(iMenu, szItem)
 
     g_ePlayerData[id][PDATA_MASTER_ACTION] = true
+    g_ePlayerData[id][PDATA_MENU_TYPE] = MENU_STATUS
     eMaster[MASTER_FLAGS] |= FLAG_SELECT
     ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
 }
@@ -1573,8 +1579,11 @@ public menuHandlerStatus(id, menu, item)
 {
     new eMaster[MASTER]
     ArrayGetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
-    eMaster[MASTER_FLAGS] &= ~FLAG_SELECT
-    ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
+    if ( !g_ePlayerData[id][PDATA_MENU_TRACE] )
+    {
+        eMaster[MASTER_FLAGS] &= ~FLAG_SELECT
+        ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
+    }
 
     switch( item )
     {
@@ -1660,11 +1669,16 @@ public menuHandlerStatus(id, menu, item)
         }
         case MENU_EXIT:
         {
-            masterSound(id, SOUND_MENU_NAV)
-            masterMenu(id, MENU_ROOT)
+            if ( !g_ePlayerData[id][PDATA_MENU_TRACE] )
+            {
+                masterSound(id, SOUND_MENU_NAV)
+                masterMenu(id, MENU_ROOT)
 
-            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
-            g_ePlayerData[id][PDATA_MASTER_MENU] = 0
+                g_ePlayerData[id][PDATA_MASTER_ACTION] = false
+                g_ePlayerData[id][PDATA_MASTER_MENU] = 0
+            }
+
+            g_ePlayerData[id][PDATA_MENU_TRACE] = false
         }
         default:
         {
@@ -1680,7 +1694,6 @@ public menuHandlerStatus(id, menu, item)
 public menuRemove(id, iMenu)
 {
     new eMaster[MASTER], szItem[64]
-
     ArrayGetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
     menuNav(id, iMenu)
 
@@ -1692,6 +1705,7 @@ public menuRemove(id, iMenu)
     menu_additem(iMenu, szItem)
 
     g_ePlayerData[id][PDATA_MASTER_ACTION] = true
+    g_ePlayerData[id][PDATA_MENU_TYPE] = MENU_REMOVE
     eMaster[MASTER_FLAGS] |= FLAG_SELECT
     ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
 }
@@ -1699,10 +1713,12 @@ public menuRemove(id, iMenu)
 public menuHandlerRemove(id, menu, item)
 {
     new eMaster[MASTER]
-
     ArrayGetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
-    eMaster[MASTER_FLAGS] &= ~FLAG_SELECT
-    ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
+    if ( !g_ePlayerData[id][PDATA_MENU_TRACE] )
+    {
+        eMaster[MASTER_FLAGS] &= ~FLAG_SELECT
+        ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
+    }
 
     switch( item )
     {
@@ -1757,11 +1773,16 @@ public menuHandlerRemove(id, menu, item)
         }
         case MENU_EXIT:
         {
-            masterSound(id, SOUND_MENU_NAV)
-            masterMenu(id, MENU_ROOT)
+            if ( !g_ePlayerData[id][PDATA_MENU_TRACE] )
+            {
+                masterSound(id, SOUND_MENU_NAV)
+                masterMenu(id, MENU_ROOT)
 
-            g_ePlayerData[id][PDATA_MASTER_ACTION] = false
-            g_ePlayerData[id][PDATA_MASTER_MENU] = 0
+                g_ePlayerData[id][PDATA_MASTER_ACTION] = false
+                g_ePlayerData[id][PDATA_MASTER_MENU] = 0
+            }
+
+            g_ePlayerData[id][PDATA_MENU_TRACE] = false
         }
         default:
         {
@@ -1777,6 +1798,8 @@ public menuHandlerRemove(id, menu, item)
 public menuScale(id, iMenu)
 {
     new szItem[64]
+
+    g_ePlayerData[id][PDATA_MENU_TYPE] = MENU_SCALE
 
     formatex(szItem, charsmax(szItem), "%L", id, "MASTER_SCALE_HEIGHT", id, g_ePlayerData[id][PDATA_SCALE_UP] ? "MASTER_ADD" : "MASTER_REMOVE")
     menu_additem(iMenu, szItem)
@@ -2935,10 +2958,9 @@ stock masterCheck(id)
         eMaster[MASTER_FLAGS] &= ~FLAG_SELECT
         ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
 
-        ArrayGetArray(g_aMaster, iBest, eMaster)
-        eMaster[MASTER_FLAGS] |= FLAG_SELECT
-        ArraySetArray(g_aMaster, iBest, eMaster)
+        g_ePlayerData[id][PDATA_MENU_TRACE] = true
         g_ePlayerData[id][PDATA_MASTER_MENU] = iBest
+        masterMenu(id, g_ePlayerData[id][PDATA_MENU_TYPE])
     }
 }
 

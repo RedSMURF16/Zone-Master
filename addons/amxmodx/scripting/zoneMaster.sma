@@ -142,13 +142,6 @@ enum
 
 enum
 {
-    STATUS_DEFAULT,
-    STATUS_FORCE_ENABLE,
-    STATUS_FORCE_DISABLE
-}
-
-enum
-{
     TEAM_NONE,
     TEAM_T,
     TEAM_CT,
@@ -299,7 +292,6 @@ enum _:MASTER
     MASTER_ID,
     MASTER_ITEM,
     MASTER_FLAGS,
-    MASTER_STATUS,
     MASTER_TEAM,
     MASTER_ANIM,
     Float:MASTER_ACTIVE_CHANCE,
@@ -582,10 +574,6 @@ new Array:g_aMaster,
     g_iDamage, g_iAmmoPickup, g_iWeapPickup, g_iScreenFade, g_iScreenShake, g_iSetFov,
     g_szWeapon[32], g_iMaxPlayers
 
-new g_szStatus[][] = {"MASTER_DEFAULT", "MASTER_ENABLED", "MASTER_DISABLED"}
-new g_szStatusChat[][] = {"MASTER_CHAT_DEFAULT", "MASTER_CHAT_ENABLED", "MASTER_CHAT_DISABLED"}
-new g_szStatusColor[][] = {"\d", "\y", "\r"}
-
 new g_szTModels[][] = {"terror", "leet", "arctic", "guerilla"}
 new g_szCTModels[][] = {"urban", "gsg9", "sas", "gign"}
 new Float:g_fScaleFactor[] = {5.0, 10.0, 20.0, 30.0, 45.0, 60.0}
@@ -717,7 +705,7 @@ public eventRoundStart()
     for ( new i = 0; i < g_iMaster; i ++ )
     {
         ArrayGetArray(g_aMaster, i, eMaster)
-        if ( eMaster[MASTER_STATUS] != STATUS_DEFAULT )
+        if ( !(eMaster[MASTER_FLAGS] & FLAG_ACTIVE) )
             continue
 
         masterReset(eMaster)
@@ -1557,16 +1545,13 @@ public menuStatus(id, iMenu)
     ArrayGetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
 
     formatex(szItem, charsmax(szItem), "%L", id, "MASTER_STATUS_CURRENT",
-    g_szStatusColor[eMaster[MASTER_STATUS]], eMaster[MASTER_NAME], id, g_szStatus[eMaster[MASTER_STATUS]])
+    eMaster[MASTER_FLAGS] & FLAG_ACTIVE ? "\y" : "\r", eMaster[MASTER_NAME], id, eMaster[MASTER_FLAGS] & FLAG_ACTIVE ? "MASTER_ENABLED" : "MASTER_DISABLED")
     menu_additem(iMenu, szItem)
 
     formatex(szItem, charsmax(szItem), "%L", id, "MASTER_STATUS_ALL_ENABLE")
     menu_additem(iMenu, szItem)
 
     formatex(szItem, charsmax(szItem), "%L", id, "MASTER_STATUS_ALL_DISABLE")
-    menu_additem(iMenu, szItem)
-
-    formatex(szItem, charsmax(szItem), "%L", id, "MASTER_STATUS_ALL_DEFAULT")
     menu_additem(iMenu, szItem)
 
     g_ePlayerData[id][PDATA_MASTER_ACTION] = true
@@ -1609,16 +1594,10 @@ public menuHandlerStatus(id, menu, item)
         }
         case STATUS_CURRENT:
         {
-            if ( ++ eMaster[MASTER_STATUS] > STATUS_FORCE_DISABLE )
-                eMaster[MASTER_STATUS] = STATUS_DEFAULT
-
-            if ( eMaster[MASTER_STATUS] == STATUS_FORCE_ENABLE )
-                eMaster[MASTER_FLAGS] |= FLAG_ACTIVE
-            else if ( eMaster[MASTER_STATUS] == STATUS_FORCE_DISABLE )
-                eMaster[MASTER_FLAGS] &= ~FLAG_ACTIVE
+            eMaster[MASTER_FLAGS] ^= FLAG_ACTIVE
 
             client_print_color(id, id, "%L %L", id, "MASTER_CHAT_TAG", id, "MASTER_CHAT_STATUS_CURRENT",
-            eMaster[MASTER_NAME], id, g_szStatusChat[eMaster[MASTER_STATUS]])
+            eMaster[MASTER_NAME], id, eMaster[MASTER_FLAGS] & FLAG_ACTIVE ? "MASTER_CHAT_ENABLED" : "MASTER_CHAT_DISABLED")
             ArraySetArray(g_aMaster, g_ePlayerData[id][PDATA_MASTER_MENU], eMaster)
 
             masterSound(id, SOUND_MENU_NAV)
@@ -1630,7 +1609,6 @@ public menuHandlerStatus(id, menu, item)
             {
                 ArrayGetArray(g_aMaster, i, eMaster)
                 eMaster[MASTER_FLAGS] |= FLAG_ACTIVE
-                eMaster[MASTER_STATUS] = STATUS_FORCE_ENABLE
 
                 ArraySetArray(g_aMaster, i, eMaster)
             }
@@ -1645,25 +1623,11 @@ public menuHandlerStatus(id, menu, item)
             {
                 ArrayGetArray(g_aMaster, i, eMaster)
                 eMaster[MASTER_FLAGS] &= ~FLAG_ACTIVE
-                eMaster[MASTER_STATUS] = STATUS_FORCE_DISABLE
 
                 ArraySetArray(g_aMaster, i, eMaster)
             }
 
             client_print_color(id, id, "%L %L", id, "MASTER_CHAT_TAG", id, "MASTER_CHAT_STATUS_ALL_DISABLED")
-            masterSound(id, SOUND_MENU_ALERT)
-            masterMenu(id, MENU_STATUS)
-        }
-        case STATUS_ALL_DEFAULT:
-        {
-            for ( new i = 0; i < g_iMaster; i ++ )
-            {
-                ArrayGetArray(g_aMaster, i, eMaster)
-                eMaster[MASTER_STATUS] = STATUS_DEFAULT
-                ArraySetArray(g_aMaster, i, eMaster)
-            }
-
-            client_print_color(id, id, "%L %L", id, "MASTER_CHAT_TAG", id, "MASTER_CHAT_STATUS_ALL_DEFAULT")
             masterSound(id, SOUND_MENU_ALERT)
             masterMenu(id, MENU_STATUS)
         }
@@ -1698,7 +1662,7 @@ public menuRemove(id, iMenu)
     menuNav(id, iMenu)
 
     formatex(szItem, charsmax(szItem), "%L", id, "MASTER_REMOVE_CURRENT",
-    g_szStatusColor[eMaster[MASTER_STATUS]], eMaster[MASTER_NAME])
+    eMaster[MASTER_FLAGS] & FLAG_ACTIVE ? "\y" : "\r", eMaster[MASTER_NAME])
     menu_additem(iMenu, szItem)
 
     formatex(szItem, charsmax(szItem), "%L", id, "MASTER_REMOVE_ALL")
@@ -2510,9 +2474,6 @@ public saveData(id)
         formatex(szData, charsmax(szData), "flags = %d^n", eMaster[MASTER_FLAGS])
         fputs(iFile, szData)
 
-        formatex(szData, charsmax(szData), "status = %d^n", eMaster[MASTER_STATUS])
-        fputs(iFile, szData)
-
         formatex(szData, charsmax(szData), "scale = %.2f %.2f %.2f^n",
         eMaster[MASTER_SCALE][0], eMaster[MASTER_SCALE][1], eMaster[MASTER_SCALE][2])
         fputs(iFile, szData)
@@ -2541,7 +2502,7 @@ public loadData()
 {
     new szFile[128], iFile,
         szData[64], szKey[32], szValue[32],
-        iItem, iFlags, iStatus, Float:fScale[3], Float:fOrigin[3], Float:fCorners[24],
+        iItem, iFlags, Float:fScale[3], Float:fOrigin[3], Float:fCorners[24],
         iCorner, iCount = -1
 
     get_mapname(szFile, charsmax(szFile))
@@ -2558,7 +2519,7 @@ public loadData()
         if ( szData[0] == '[' )
         {
             if ( iCount != -1 )
-                loadDataMaster(fCorners, fScale, fOrigin, iItem, iFlags, iStatus, iCount)
+                loadDataMaster(fCorners, fScale, fOrigin, iItem, iFlags, iCount)
 
             iCount ++
         }
@@ -2575,10 +2536,6 @@ public loadData()
             else if ( equal(szKey, "flags") )
             {
                 iFlags = str_to_num(szValue)
-            }
-            else if ( equal(szKey, "status") )
-            {
-                iStatus = str_to_num(szValue)
             }
             else if ( equal(szKey, "scale") )
             {
@@ -2613,20 +2570,19 @@ public loadData()
     }
 
     if ( iCount != -1 )
-        loadDataMaster(fCorners, fScale, fOrigin, iItem, iFlags, iStatus, iCount)
+        loadDataMaster(fCorners, fScale, fOrigin, iItem, iFlags, iCount)
 
     fclose(iFile)
     return PLUGIN_HANDLED
 }
 
-stock loadDataMaster(Float:fCorners[24], Float:fScale[3], Float:fOrigin[3], iItem, iFlags, iStatus, iCount)
+stock loadDataMaster(Float:fCorners[24], Float:fScale[3], Float:fOrigin[3], iItem, iFlags, iCount)
 {
     new eMaster[MASTER]
     masterCreate(0, iItem)
     ArrayGetArray(g_aMaster, iCount, eMaster)
 
     eMaster[MASTER_FLAGS] = iFlags
-    eMaster[MASTER_STATUS] = iStatus
     xs_vec_copy(fScale, eMaster[MASTER_SCALE])
     xs_vec_copy(fOrigin, eMaster[MASTER_ORIGIN])
     for ( new i = 0; i < 24; i ++ )

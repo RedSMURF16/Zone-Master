@@ -1349,11 +1349,11 @@ public client_authorized(id)
 
 public client_disconnected(id)
 {
-    new iItem
+    new eMaster[MASTER], iItem
     if ( g_ePlayerData[id][PDATA_MASTER_GHOST]
-    && (iItem = pev(g_ePlayerData[id][PDATA_MASTER_GHOST], MASTER_ARRAY_ITEM)) != -1 )
+    && (iItem = masterGet(eMaster, g_ePlayerData[id][PDATA_MASTER_GHOST])) != -1 )
     {
-        masterKill(g_ePlayerData[id][PDATA_MASTER_GHOST])
+        masterKill(eMaster[MASTER_ID])
         masterRemove(iItem)
     }
 

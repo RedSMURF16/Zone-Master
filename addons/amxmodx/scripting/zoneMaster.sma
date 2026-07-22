@@ -583,12 +583,12 @@ public plugin_init()
 {
     register_plugin("Zone Master", PLUGIN_VERSION, "RedSMURF")
 
-    register_clcmd("say /zm", "cmdMenu", ADMIN_RCON)
-    register_clcmd("say_team /zm", "cmdMenu", ADMIN_RCON)
-    register_clcmd("say /zonemaster", "cmdMenu", ADMIN_RCON)
-    register_clcmd("say_team /zonemaster", "cmdMenu", ADMIN_RCON)
-    register_concmd("mz_reload", "cmdReload", ADMIN_RCON, "-- Reload the configuration file")
-    register_concmd("zonemaster_reload", "cmdReload", ADMIN_RCON, "-- Reload the configuration file")
+    register_clcmd("say /zm",               "cmdMenu", ADMIN_RCON, "-- Opens the Zone Master menu.")
+    register_clcmd("say_team /zm",          "cmdMenu", ADMIN_RCON, "-- Opens the Zone Master menu.")
+    register_clcmd("say /zonemaster",       "cmdMenu", ADMIN_RCON, "-- Opens the Zone Master menu.")
+    register_clcmd("say_team /zonemaster",  "cmdMenu", ADMIN_RCON, "-- Opens the Zone Master menu.")
+    register_concmd("mz_reload",            "cmdReload", ADMIN_RCON, "-- Reload the configuration file")
+    register_concmd("zonemaster_reload",    "cmdReload", ADMIN_RCON, "-- Reload the configuration file")
 
     register_dictionary("ZoneMaster.txt")
 
@@ -672,23 +672,6 @@ public cmdReload(id, iLevel, iCmd)
     console_print(id, "The configuration file has been reloaded successfully !")
 
     return PLUGIN_HANDLED
-}
-
-public client_command(id)
-{
-    if ( !g_ePlayerData[id][PDATA_MASTER_GHOST] )
-        return PLUGIN_CONTINUE
-
-    new szCmd[16]
-    read_argv(0, szCmd, charsmax(szCmd))
-
-    if ( contain(szCmd, "weapon_") != -1 ||
-    equal(szCmd, "invnext") ||
-    equal(szCmd, "invprev") ||
-    equal(szCmd, "lastinv") )
-        return PLUGIN_HANDLED
-
-    return PLUGIN_CONTINUE
 }
 
 public eventRoundStart()

@@ -21,7 +21,6 @@ Custom setups are saved per map and automatically loaded on every map start.
 - Up zones apply upward velocity and gravity multipliers, Wings zones grant noclip and/or godmode while inside
 - Independent axis scaling with size constraints for precise zone resizing
 - Noclip and intuitive ghost preview tracking for natural alignment with grounds and walls
-- [color=red]Requires AMX Mod X 1.9.0+[/color]
 
 ## 💬 Commands
 - `say /zm` - Opens the Zone Master menu.
@@ -70,3 +69,5 @@ Custom setups are saved per map and automatically loaded on every map start.
 ```text
 * v1.0: Initial release.
 ```
+
+[![Watch on YouTube](https://img.shields.io/badge/YouTube-Watch%20video-FF0000?logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=LOLtGZad7hU)

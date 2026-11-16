@@ -22,6 +22,10 @@ Custom setups are saved per map and automatically loaded on every map start.
 - Independent axis scaling with size constraints for precise zone resizing
 - Noclip and intuitive ghost preview tracking for natural alignment with grounds and walls
 
+## 📋 Requirements
+- ReGameDLL
+- AMX Mod X 1.10+
+
 ## 💬 Commands
 - `say /zm` - Opens the Zone Master menu.
 - `say_team /zm` - Opens the Zone Master menu.

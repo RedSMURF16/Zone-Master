@@ -1,7 +1,7 @@
 <h1 align="center">Zone Master</h1>
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=LOLtGZad7hU"><img src="https://img.youtube.com/vi/LOLtGZad7hU/maxresdefault.jpg" alt="Watch on YouTube" width="600"></a>
+  <img src="images/demo.gif" alt="Zone Master">
 </p>
 
 ## 📝 Description
@@ -21,10 +21,6 @@ Custom setups are saved per map and automatically loaded on every map start.
 - Up zones apply upward velocity and gravity multipliers, Wings zones grant noclip and/or godmode while inside
 - Independent axis scaling with size constraints for precise zone resizing
 - Noclip and intuitive ghost preview tracking for natural alignment with grounds and walls
-
-## 📋 Requirements
-- ReGameDLL
-- AMX Mod X 1.10+
 
 ## 💬 Commands
 - `say /zm` - Opens the Zone Master menu.

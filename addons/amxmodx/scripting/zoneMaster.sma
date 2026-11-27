@@ -715,8 +715,16 @@ ReadFile()
 {
     if ( g_bFileWasRead )
     {
-        for ( new id = 1; id <= g_iMaxPlayers; id ++ )
-            if ( is_user_connected(id))
+        ArrayClear(g_aMasterConfig)
+        g_iMasterConfig = 0
+    }
+
+    new g_szFileName[MAX_RESOURCE_PATH_LENGTH], iFile
+    get_configsdir(g_szFileName, charsmax(g_szFileName))
+    add(g_szFileName, charsmax(g_szFileName), "/ZoneMaster.ini")
+    iFile = fopen(g_szFileName, "rt")
+    if ( !iFile )
+    {
         set_fail_state("An error occured during the opening of the configuration file !")
     }
 
